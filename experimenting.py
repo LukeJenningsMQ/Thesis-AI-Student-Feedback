@@ -3,7 +3,7 @@ from transformers import pipeline
 
 classifier = pipeline("sentiment-analysis")
 
-res = classifier("bigg booba")
+res = classifier("i love engineering")
 
 print(res)
 
