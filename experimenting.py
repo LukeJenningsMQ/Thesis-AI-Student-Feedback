@@ -1,20 +1,40 @@
 
 from transformers import pipeline
+from transformers import RobertaTokenizer, RobertaModel, AutoModelForSequenceClassification, AutoTokenizer
 
-classifier = pipeline("sentiment-analysis")
+tokenizerRoberta = AutoTokenizer.from_pretrained('roberta-base')
+modelRoberta = AutoModelForSequenceClassification.from_pretrained('roberta-base')
+modelGPT = "distilgpt2"
 
-res = classifier("i love engineering")
+def sentimentAnalysis(text, modelName):
+    classifier = pipeline("sentiment-analysis", model=modelName, tokenizer=tokenizerRoberta)
+    predictions = classifier(text)
 
-print(res)
+    # Get the predicted class.
+    predicted_class = predictions["label"]
 
-generator = pipeline("text-generation", model="distilgpt2")
+    # Print the predicted class.
+    print(f"The predicted class is: {predicted_class}.")
 
-res = generator("the sky is very ", max_length=30,num_return_sequences=2)
+    # Get the confidence score.
+    score = predictions["score"]
 
-print(res)
-
-classifier = pipeline("zero-shot-classification")
-
-res = classifier("Through the continuation of designing and developing engineering projects, the world has become more healthier and safer for everyone. By looking at engineering projects we will be able to see tie importance of them making society better by making people interact in a more safe and healthy manner. The engineering projects that I will focus on are self-driving vehicles and telecommunications software for workplace. We can see health in our society improving as better telecommunication software has led to the rise of decentralised workforces during pandemics. In 2020, many businesses had to figure out how to operate during the coronavirus pandemic. With this pandemic, there was a risk of employees getting sick, leading them not being able to come into work and the risk of the virus being across the entire work team as the virus was easier spread. Business owner had to think of ways to help employees be able to do their job while in quarantine and help employees feel safe to do their job in a safe environment. This is why many businesses turned to using tele3communication software such as Zoom, as this allowed to have their workforce be able to continue to work even if they were at home. This software allowed for their team to still be able to have meeting by allowing them to talk over the internet using microphones and webcams. Features such as screen sharing also help in presenting work a particular person was doing and breakout rooms so teams could be separated into specific teams. We can see how many businesses saw this importance of this software during the pandemic as statista.com [1] reports that Zoom had 300 million people using it daily during April of 2020, while in 2019 it was only 10 million people using the software daily. By having employees to work from home, the virus was able to be spread less meaning less people could get sick, helping our healthcare system be able to have less patients. Thus, this software was helping society be healthier as it helped less people be less sick. With self-driving cars becoming more prevalent on our roads, we can start to see how our roads in this society can become safer.  Many companies such as tesla and google have put money into seeing self-driving cars being developed, using AI to help these vehicles be able to detect parts our world including other cars and people. Kia.com [2] says that experts in the industry say that these autonomous cars will be much safter than human operated cars as it reduces human error. As these cars will stop immediately once it detects a human on the road or if a car is breaking fast, the car will have a much faster reaction speed than a normal human would. As a result, this could lead to less car accidents and less injuries as car crashes reduces as more self-driving cars go onto the road. Thus, society becomes safer for humans to drive places with these vehicles and keeping them healthier as they stay out of hospitals from car accidents. In Conclusion, through software being able to easily connect people from their own home to do work, we are able to make people lives healthier during pandemics as we avoid the issue of spreading a virus. Also, autonomous cars helping our society be a safer place for people to live as their technology reduces the number to car accidents. By seeing these results, I personally believe we have to continue to create engineering projects so we can make the world a safer and healthier place to live. I feel like this information can motivate engineers to show how impactful engineering work can be and how engineers can change the world in a positive way and it doesn’t always have to be about creating products for a profit.", candidate_labels=["Cyber Security", "Engineering", "Art", "Science", "Computing", "Law", "Business","Sport"])
-
-print(res)
+    # Print the confidence score.
+    print(f"The confidence score is: {score}.")
+    
+def zeroShotClassification(text, labels, modelName):
+    classifier = pipeline("zero-shot-classification", model=modelName, tokenizer=tokenizerRoberta)
+    res = classifier(text, candidate_labels=labels)
+    print(res)
+    
+def textGeneration(text, modelName):
+    generator = pipeline("text-generation", model=modelName)
+    res = generator(text, max_length=30,num_return_sequences=1)
+    print(res)
+    
+    
+textInput = "i love trees. We can grow them and make the world a better place as i provides oxygen for earth. Flower seeds grass ocean"
+labelsInput = ["Cyber Security", "Engineering", "Art", "Science", "Computing", "Law", "Business","Sport", "Nature"]
+sentimentAnalysis(textInput, modelRoberta)
+zeroShotClassification(textInput, labelsInput, modelRoberta)
+textGeneration(textInput, modelGPT)
