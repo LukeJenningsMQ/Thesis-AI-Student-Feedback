@@ -1,43 +1,40 @@
-import torch
 import transformers
-import networkx as nx
-import numpy as np
+from transformers import RobertaTokenizer, RobertaModel, AutoModelForSequenceClassification, AutoTokenizer, logging, AutoModel
+import sklearn.manifold
+import matplotlib.pyplot as plt
+import torch
+
 
 # Load the BERT model.
 model = transformers.AutoModel.from_pretrained("bert-base-uncased")
 
-# Get the tokenizer.
-tokenizer = model.config.get_tokenizer()
+# Create a tokenizer.
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
-# Define the texts.
-texts = ["cat", "dog", "mouse", "bird", "fish"]
+# Tokenize the texts.
+texts = ["This is a text about BERT.", "This is a text about RoBERTa."]
+tokens = [tokenizer(text) for text in texts]
 
-# Convert the texts to a list of integers.
-text_ids = [tokenizer(text).input_ids for text in texts]
+# Convert the tokens to a list of integers.
+token_ids = [tokenizer.convert_tokens_to_ids(token) for token in tokens]
 
-# Convert the list of integers to a tensor.
-tensor_texts = torch.tensor(text_ids)
+# Convert the tokens to a tensor of integers.
+tokens_tensor = torch.tensor(token_ids, dtype=torch.int64)
 
-# Extract the embeddings for the entities in your knowledge domain.
-embeddings = model(tensor_texts).last_hidden_state
+# Extract the embeddings for the tokens.
+embeddings = model.embeddings.word_embeddings(tokens_tensor)
+embeddings = embeddings.detach()
+embeddings = embeddings.view(-1, 2)
 
-# Create a graph.
-graph = nx.Graph()
+# Create a knowledge map from the embeddings.
+tsne = sklearn.manifold.TSNE(n_components=2, perplexity=1)
+embeddings_tsne = tsne.fit_transform(embeddings)
+# Convert the token IDs to tokens.
+tokens = tokenizer.convert_ids_to_tokens(embeddings_tsne)
 
-# Add the entities to the graph.
-for word, embedding in zip(texts, embeddings):
-    graph.add_node(word)
-
-# Compute the similarity between the embeddings.
-similarity_scores = []
-for i in range(len(embeddings)):
-    for j in range(i + 1, len(embeddings)):
-        similarity_scores.append(np.cosine_similarity(embeddings[i], embeddings[j]))
-
-# Use the similarity scores to create the edges in the graph.
-for i in range(len(similarity_scores)):
-    if similarity_scores[i] > 0.5:
-        graph.add_edge(i, j, weight=similarity_scores[i])
-
-# Plot the graph.
-nx.draw(graph, with_labels=True)
+# Iterate through the list of tokens and print the tokens and their corresponding coordinates.
+for i, token in enumerate(tokens):
+    print(f"{token}: {embeddings_tsne[i]}")
+# Visualize the knowledge map.
+plt.scatter(embeddings_tsne[:, 0], embeddings_tsne[:, 1])
+plt.show()

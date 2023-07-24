@@ -23,9 +23,14 @@ def textGeneration(text, modelName):
     res = generator(text, max_length=30,num_return_sequences=1)
     print(res)
     
+def stringToTokens(text, tokeniser):
+    input = tokeniser(text)
+    print(input)
+    return input
     
 textInput = "i love trees. We can grow them and make the world a better place as i provides oxygen for earth. Flower seeds grass ocean"
 labelsInput = ["Cyber Security", "Engineering", "Art", "Science", "Computing", "Law", "Business","Sport", "Nature"]
 sentimentAnalysis(textInput)
 zeroShotClassification(textInput, labelsInput)
 textGeneration(textInput, modelGPT)
+stringToTokens(textInput, tokenizerRoberta)
