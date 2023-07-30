@@ -1,11 +1,10 @@
 
 from transformers import pipeline
-from transformers import RobertaTokenizer, RobertaModel, AutoModelForSequenceClassification, AutoTokenizer, logging
-
+from transformers import RobertaTokenizer, RobertaModel, AutoModelForSequenceClassification, AutoTokenizer, logging,AutoModelForTokenClassification,BertForTokenClassification, TokenClassificationPipeline
 
 logging.set_verbosity_warning()
-tokenizerRoberta = AutoTokenizer.from_pretrained('bert-base-cased')
-modelRoberta = AutoModelForSequenceClassification.from_pretrained('bert-base-cased')
+tokenizerBERT = AutoTokenizer.from_pretrained("QCRI/bert-base-multilingual-cased-pos-english")
+modelBERT = AutoModelForTokenClassification.from_pretrained('QCRI/bert-base-multilingual-cased-pos-english')
 modelGPT = "distilgpt2"
 
 def sentimentAnalysis(text):
@@ -27,10 +26,21 @@ def stringToTokens(text, tokeniser):
     input = tokeniser(text)
     print(input)
     return input
-    
-textInput = "i love trees. We can grow them and make the world a better place as i provides oxygen for earth. Flower seeds grass ocean"
+
+def NamedEntityRecognition(text,modelUsed,tokeniserUsed):
+    nlp = pipeline("ner", model=modelUsed, tokenizer=tokeniserUsed)
+    ner_results = nlp(text)
+    print(ner_results)
+    return ner_results
+def PartOfSpeech(text,modelUsed,tokeniserUsed):
+    pipeline = TokenClassificationPipeline(model=modelUsed, tokenizer=tokeniserUsed)
+    outputs = pipeline(text)
+    print(outputs)
+    return outputs
+textInput = "Engineers need to follow a proper schedule, and to do this, they should use tools such as a Gantt Chart or a critical path method."
 labelsInput = ["Cyber Security", "Engineering", "Art", "Science", "Computing", "Law", "Business","Sport", "Nature"]
 sentimentAnalysis(textInput)
 zeroShotClassification(textInput, labelsInput)
 textGeneration(textInput, modelGPT)
-stringToTokens(textInput, tokenizerRoberta)
+tokens = stringToTokens(textInput, tokenizerBERT)
+PartOfSpeech(textInput,modelBERT,tokenizerBERT)
