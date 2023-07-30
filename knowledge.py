@@ -36,5 +36,6 @@ tokens = tokenizer.convert_ids_to_tokens(embeddings_tsne)
 for i, token in enumerate(tokens):
     print(f"{token}: {embeddings_tsne[i]}")
 # Visualize the knowledge map.
+
 plt.scatter(embeddings_tsne[:, 0], embeddings_tsne[:, 1])
 plt.show()

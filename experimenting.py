@@ -1,10 +1,12 @@
-
+import torch
+import matplotlib.pyplot as plt
+from sklearn.metrics.pairwise import cosine_similarity
 from transformers import pipeline
-from transformers import RobertaTokenizer, RobertaModel, AutoModelForSequenceClassification, AutoTokenizer, logging,AutoModelForTokenClassification,BertForTokenClassification, TokenClassificationPipeline
+from transformers import RobertaTokenizer, BertModel, AutoModelForSequenceClassification, AutoTokenizer, logging,AutoModelForTokenClassification,BertForTokenClassification, TokenClassificationPipeline
 
 logging.set_verbosity_warning()
 tokenizerBERT = AutoTokenizer.from_pretrained("QCRI/bert-base-multilingual-cased-pos-english")
-modelBERT = AutoModelForTokenClassification.from_pretrained('QCRI/bert-base-multilingual-cased-pos-english')
+modelBERT = BertModel.from_pretrained('QCRI/bert-base-multilingual-cased-pos-english', output_hidden_states = True)
 modelGPT = "distilgpt2"
 
 def sentimentAnalysis(text):
@@ -32,11 +34,33 @@ def NamedEntityRecognition(text,modelUsed,tokeniserUsed):
     ner_results = nlp(text)
     print(ner_results)
     return ner_results
+
 def PartOfSpeech(text,modelUsed,tokeniserUsed):
     pipeline = TokenClassificationPipeline(model=modelUsed, tokenizer=tokeniserUsed)
     outputs = pipeline(text)
     print(outputs)
     return outputs
+
+def similarWords(text, modelUsed, tokeniserUsed):
+    tokens = stringToTokens(text,tokeniserUsed)
+    idsForTokens = tokeniserUsed.convert_tokens_to_ids(tokens)
+    token_tensor = torch.tensor([idsForTokens])
+    modelUsed.eval()
+    similarities = list()
+    with torch.no_grad():
+        output = modelUsed(token_tensor)
+        print(output)
+    return similarities
+
+def plotSimilarities(similarities):
+    plt.style.use("seaborn-whitegrid")
+    fig = plt.figure()
+    ax = plt.axes()
+    plt.plot(range(1,13), similarities, linestyle= "solid")
+    plt.title("word embeddings similarities curve from layer 1 to 12")
+    plt.xlabel("Layer")
+    plt.ylabel("Cosine Similarity")
+
 textInput = "Engineers need to follow a proper schedule, and to do this, they should use tools such as a Gantt Chart or a critical path method."
 labelsInput = ["Cyber Security", "Engineering", "Art", "Science", "Computing", "Law", "Business","Sport", "Nature"]
 sentimentAnalysis(textInput)
@@ -44,3 +68,7 @@ zeroShotClassification(textInput, labelsInput)
 textGeneration(textInput, modelGPT)
 tokens = stringToTokens(textInput, tokenizerBERT)
 PartOfSpeech(textInput,modelBERT,tokenizerBERT)
+similar = similarWords(textInput,modelBERT,tokenizerBERT)
+#plotSimilarities(similar)
+
+
