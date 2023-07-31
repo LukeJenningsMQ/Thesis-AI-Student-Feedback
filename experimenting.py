@@ -44,7 +44,6 @@ def similarWords(text, modelUsed, tokeniserUsed,word1Index,word2Index):
     similarities = list()
     with torch.no_grad():
         output = modelUsed(token_tensor)
-        print(output)
         for i in range(1, 13):
            last_hidden_state = output[2][i]
            print(last_hidden_state)
@@ -66,10 +65,10 @@ def plotSimilarities(similarities):
 
 
 
-#tokenizerBERT = BertTokenizer.from_pretrained("QCRI/bert-base-multilingual-cased-pos-english")
-#modelBERT = BertModel.from_pretrained('QCRI/bert-base-multilingual-cased-pos-english', output_hidden_states = True)
-tokenizerBERT = BertTokenizer.from_pretrained("bert-base-uncased")
-modelBERT = BertModel.from_pretrained('bert-base-uncased', output_hidden_states = True)
+tokenizerBERTPOS = AutoTokenizer.from_pretrained("QCRI/bert-base-multilingual-cased-pos-english")
+modelBERTPOS = AutoModelForTokenClassification.from_pretrained('QCRI/bert-base-multilingual-cased-pos-english', output_hidden_states = True)
+tokenizerBERT = BertTokenizer.from_pretrained("bert-base-cased")
+modelBERT = BertModel.from_pretrained('bert-base-cased', output_hidden_states = True)
 #modelGPT = "distilgpt2"
 textInput = "Engineers need to follow a proper schedule and to do this, they should use tools such as a Gantt Chart or a critical path method"
 #labelsInput = ["Cyber Security", "Engineering", "Art", "Science", "Computing", "Law", "Business","Sport", "Nature"]
@@ -77,8 +76,10 @@ textInput = "Engineers need to follow a proper schedule and to do this, they sho
 #zeroShotClassification(textInput, labelsInput)
 #textGeneration(textInput, modelGPT)
 #tokens = stringToTokens(textInput, tokenizerBERT)
-#PartOfSpeech(textInput,modelBERT,tokenizerBERT)
+PartOfSpeech(textInput,modelBERTPOS,tokenizerBERTPOS)
 similar = similarWords(textInput,modelBERT,tokenizerBERT,0,6)
+plotSimilarities(similar)
+similar = similarWords(textInput,modelBERT,tokenizerBERT,0,18)
 plotSimilarities(similar)
 
 
