@@ -48,16 +48,15 @@ def similarWords(text, modelUsed, tokeniserUsed,word1Index,word2Index):
         for i in range(1, 13):
            last_hidden_state = output[2][i]
            print(last_hidden_state)
-           
-          # word_embed_1 = last_hidden_state
-           #e = word_embed_1[0][word1Index].reshape(1,-1)
-           #s = word_embed_1[0][word2Index].reshape(1,-1)
-           #similarity = cosine_similarity(s,e)
-           #similarities.append(similarity[0][0])
+           word_embed_1 = last_hidden_state
+           compare1 = word_embed_1[0][word1Index].reshape(1,-1)
+           compare2 = word_embed_1[0][word2Index].reshape(1,-1)
+           similarity = cosine_similarity(compare1,compare2)
+           similarities.append(similarity[0][0])
     return similarities
 
 def plotSimilarities(similarities):
-    plt.style.use("seaborn-whitegrid")
+    plt.style.use("Solarize_Light2")
     fig = plt.figure()
     ax = plt.axes()
     plt.plot(range(1,13), similarities, linestyle= "solid")
@@ -80,6 +79,6 @@ textInput = "Engineers need to follow a proper schedule and to do this, they sho
 #tokens = stringToTokens(textInput, tokenizerBERT)
 #PartOfSpeech(textInput,modelBERT,tokenizerBERT)
 similar = similarWords(textInput,modelBERT,tokenizerBERT,0,6)
-#plotSimilarities(similar)
+plotSimilarities(similar)
 
 
