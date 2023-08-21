@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import pipeline
 from transformers import RobertaTokenizer, BertModel, BertTokenizer, AutoModelForSequenceClassification, AutoTokenizer, logging,AutoModelForTokenClassification,BertForTokenClassification, TokenClassificationPipeline
+from bertopic import BERTopic
 
 def sentimentAnalysis(text):
     classifier = pipeline("sentiment-analysis")
@@ -76,10 +77,16 @@ textInput = "Engineers need to follow a proper schedule and to do this, they sho
 #zeroShotClassification(textInput, labelsInput)
 #textGeneration(textInput, modelGPT)
 #tokens = stringToTokens(textInput, tokenizerBERT)
-PartOfSpeech(textInput,modelBERTPOS,tokenizerBERTPOS)
-similar = similarWords(textInput,modelBERT,tokenizerBERT,0,6)
-plotSimilarities(similar)
-similar = similarWords(textInput,modelBERT,tokenizerBERT,0,18)
-plotSimilarities(similar)
+#PartOfSpeech(textInput,modelBERTPOS,tokenizerBERTPOS)
+#similar = similarWords(textInput,modelBERT,tokenizerBERT,0,6)
+#plotSimilarities(similar)
+#similar = similarWords(textInput,modelBERT,tokenizerBERT,0,18)
+#plotSimilarities(similar)
+
+docs = ['Engineers need to follow a proper schedule and to do this, they should use tools such as a Gantt Chart or a critical path method','Ganntt Chart is a bar chart that shows what tasks are in the project and when these projects are schedule to be done','critical path analysis shows the minium amount of time a tasks needs to be complete, it gives information on slack time for the project and where time for one task can defered to another task']
+topic_model = BERTopic(embedding_model="all-MiniLM-L6-v2")
+
+print("Hello")
+
 
 
